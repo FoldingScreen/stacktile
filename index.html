@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>겹겹타일 | 970 KOR</title>
   <link rel="stylesheet" href="https://foldingscreen.github.io/970KOR.github.io/style.css?v=split-34" />
-  <link rel="stylesheet" href="stack-tile.css?v=1" />
+  <link rel="stylesheet" href="stack-tile.css?v=2" />
 
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -28,13 +28,14 @@
         </div>
 
         <div class="public-nickname-card">
-          <label for="stackTileNicknameInput">랭킹 닉네임</label>
+          <label>랭킹 정보</label>
           <div class="public-nickname-row">
-            <input id="stackTileNicknameInput" type="text" maxlength="20" placeholder="닉네임 입력" autocomplete="nickname" />
+            <input id="stackTileServerInput" type="number" inputmode="numeric" min="1" max="9999" placeholder="서버 숫자" autocomplete="off" />
+            <input id="stackTileNicknameInput" type="text" maxlength="20" placeholder="닉네임" autocomplete="nickname" />
             <button id="stackTileNicknameSaveBtn" type="button" onclick="savePublicStackTileNickname()">시작하기</button>
           </div>
-          <div id="stackTileNicknameHelp" class="public-nickname-help">닉네임을 입력하면 클리어 기록이 랭킹에 저장됩니다.</div>
-          <button id="stackTileNicknameClearBtn" class="hidden" type="button" onclick="clearPublicStackTileNickname()">닉네임 변경</button>
+          <div id="stackTileNicknameHelp" class="public-nickname-help">서버 숫자와 닉네임을 입력하면 클리어 기록이 랭킹에 저장됩니다.</div>
+          <button id="stackTileNicknameClearBtn" class="hidden" type="button" onclick="clearPublicStackTileNickname()">정보 변경</button>
         </div>
       </section>
 
@@ -50,6 +51,6 @@
     </main>
   </div>
 
-  <script src="stack-tile.js?v=1"></script>
+  <script src="stack-tile.js?v=2"></script>
 </body>
 </html>

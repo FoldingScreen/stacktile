@@ -73,9 +73,9 @@ function syncPublicStackTileNickname(){
 
   if(status){
     if(label){
-      status.innerHTML=`<div class="public-info-line"><span>랭킹명</span><strong>${escapeHtml(label)}</strong></div>`;
+      status.innerHTML=`<div class="public-info-line"><strong>${escapeHtml(label)}</strong></div>`;
     }else if(stackTilePrivateRankingMode){
-      status.innerHTML=`<div class="public-info-line"><span>랭킹명</span><strong>비공개</strong></div>`;
+      status.innerHTML=`<div class="public-info-line"><strong>비공개</strong></div>`;
     }else{
       status.textContent="저장된 정보가 없습니다. 첫 클리어 시 랭킹 등록 여부를 묻습니다.";
     }
@@ -87,7 +87,7 @@ function syncPublicStackTileNickname(){
       : "저장된 정보는 이 브라우저에만 보관됩니다.";
   }
 
-  if(openBtn)openBtn.textContent=label?"정보 변경":"정보 저장";
+  if(openBtn)openBtn.textContent=label?"변경":"저장";
   if(clearBtn)clearBtn.classList.toggle("hidden",!label);
 }
 

@@ -120,7 +120,7 @@ body{
 .stack-info-overlay{
   position:fixed;
   inset:0;
-  z-index:90;
+  z-index:99990;
   background:rgba(0,0,0,.62);
 }
 
@@ -129,7 +129,7 @@ body{
   left:50%;
   top:50%;
   transform:translate(-50%,-50%);
-  z-index:100;
+  z-index:99991;
   width:min(520px,calc(100vw - 28px));
   max-height:calc(100vh - 40px);
   overflow:auto;

@@ -36,7 +36,7 @@ function getPublicStackTilePlayerLabel(){
   const server=String(state.serverNumber||"").trim();
   const nickname=String(state.nickname||"").trim();
 
-  if(server&&nickname)return `${server}서버 ${nickname}`;
+  if(server&&nickname)return `[${server}]${nickname}`;
   return "";
 }
 
@@ -73,9 +73,9 @@ function syncPublicStackTileNickname(){
 
   if(status){
     if(label){
-      status.innerHTML=`<div class="public-info-line"><span>서버</span><strong>${escapeHtml(state.serverNumber)}서버</strong></div><div class="public-info-line"><span>닉네임</span><strong>${escapeHtml(state.nickname)}</strong></div>`;
+      status.innerHTML=`<div class="public-info-line"><span>랭킹명</span><strong>${escapeHtml(label)}</strong></div>`;
     }else if(stackTilePrivateRankingMode){
-      status.innerHTML=`<div class="public-info-line"><span>랭킹</span><strong>비공개 등록</strong></div>`;
+      status.innerHTML=`<div class="public-info-line"><span>랭킹명</span><strong>비공개</strong></div>`;
     }else{
       status.textContent="저장된 정보가 없습니다. 첫 클리어 시 랭킹 등록 여부를 묻습니다.";
     }

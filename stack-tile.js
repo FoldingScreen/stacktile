@@ -72,9 +72,13 @@ function syncPublicStackTileNickname(){
   if(nicknameInput)nicknameInput.value=state.nickname||"";
 
   if(status){
-    status.textContent=label
-      ? `현재 랭킹 정보: ${label}`
-      : "정보를 저장하지 않아도 플레이할 수 있습니다. 첫 클리어 시 랭킹 등록 여부를 묻습니다.";
+    if(label){
+      status.innerHTML=`<div class="public-info-line"><span>서버</span><strong>${escapeHtml(state.serverNumber)}서버</strong></div><div class="public-info-line"><span>닉네임</span><strong>${escapeHtml(state.nickname)}</strong></div>`;
+    }else if(stackTilePrivateRankingMode){
+      status.innerHTML=`<div class="public-info-line"><span>랭킹</span><strong>비공개 등록</strong></div>`;
+    }else{
+      status.textContent="저장된 정보가 없습니다. 첫 클리어 시 랭킹 등록 여부를 묻습니다.";
+    }
   }
 
   if(help){

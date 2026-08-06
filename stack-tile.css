@@ -52,7 +52,7 @@ body{
 
 .public-hero{
   display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(260px,360px);
+  grid-template-columns:minmax(0,1fr) minmax(300px,430px);
   gap:16px;
   align-items:stretch;
   margin-bottom:16px;
@@ -94,7 +94,7 @@ body{
 
 .public-nickname-row{
   display:grid;
-  grid-template-columns:minmax(0,1fr) auto;
+  grid-template-columns:110px minmax(0,1fr) auto;
   gap:8px;
 }
 
@@ -106,6 +106,10 @@ body{
   background:#09111d;
   color:#e8edf7;
   padding:10px 12px;
+}
+
+.public-nickname-row input[type="number"]{
+  text-align:center;
 }
 
 .public-nickname-row button,
@@ -168,5 +172,9 @@ body{
 
   .public-nickname-row{
     grid-template-columns:1fr;
+  }
+
+  .public-nickname-row input[type="number"]{
+    text-align:left;
   }
 }

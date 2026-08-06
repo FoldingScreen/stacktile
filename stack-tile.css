@@ -87,6 +87,13 @@ body{
   gap:10px;
 }
 
+.public-info-card-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
 .public-nickname-card label{
   color:#dbeafe;
   font-weight:1000;
@@ -108,7 +115,8 @@ body{
 .public-info-actions{
   display:flex;
   flex-wrap:wrap;
-  gap:8px;
+  justify-content:flex-end;
+  gap:6px;
 }
 
 .public-info-actions button,
@@ -121,6 +129,12 @@ body{
   min-height:42px;
   font-weight:900;
   white-space:nowrap;
+}
+
+.public-info-actions button{
+  padding:7px 10px;
+  min-height:34px;
+  font-size:12px;
 }
 
 .public-nickname-help{

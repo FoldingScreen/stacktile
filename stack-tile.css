@@ -52,7 +52,7 @@ body{
 
 .public-hero{
   display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(300px,430px);
+  grid-template-columns:minmax(0,1fr) minmax(260px,360px);
   gap:16px;
   align-items:stretch;
   margin-bottom:16px;
@@ -92,28 +92,13 @@ body{
   font-weight:1000;
 }
 
-.public-nickname-row{
-  display:grid;
-  grid-template-columns:110px minmax(0,1fr) auto;
+.public-info-actions{
+  display:flex;
+  flex-wrap:wrap;
   gap:8px;
 }
 
-.public-nickname-row input{
-  width:100%;
-  min-height:44px;
-  border:1px solid #22304a;
-  border-radius:14px;
-  background:#09111d;
-  color:#e8edf7;
-  padding:10px 12px;
-}
-
-.public-nickname-row input[type="number"]{
-  text-align:center;
-}
-
-.public-nickname-row button,
-.public-nickname-card button,
+.public-info-actions button,
 .public-game-header button{
   border:1px solid #315a93;
   background:#102545;
@@ -130,6 +115,126 @@ body{
   font-size:13px;
   line-height:1.45;
   font-weight:800;
+}
+
+.stack-info-overlay{
+  position:fixed;
+  inset:0;
+  z-index:90;
+  background:rgba(0,0,0,.62);
+}
+
+.stack-info-modal{
+  position:fixed;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  z-index:100;
+  width:min(520px,calc(100vw - 28px));
+  max-height:calc(100vh - 40px);
+  overflow:auto;
+  background:#08121f;
+  border:1px solid #29466f;
+  border-radius:24px;
+  padding:18px;
+  box-shadow:0 24px 70px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.03) inset;
+}
+
+.stack-info-modal-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px;
+}
+
+.stack-info-modal-header h3{
+  margin:0;
+  font-size:22px;
+  font-weight:1000;
+  color:#edf3ff;
+}
+
+.stack-info-modal-header button{
+  border:1px solid #22304a;
+  background:#0b1220;
+  color:#dce7ff;
+  border-radius:999px;
+  padding:7px 11px;
+  min-height:34px;
+  font-weight:900;
+}
+
+.stack-info-modal-desc{
+  margin:0 0 14px;
+  color:#c8d5ea;
+  line-height:1.55;
+  font-weight:800;
+}
+
+.stack-info-form-grid{
+  display:grid;
+  grid-template-columns:130px minmax(0,1fr);
+  gap:10px;
+}
+
+.stack-info-form-group{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.stack-info-form-group label{
+  color:#dbeafe;
+  font-size:13px;
+  font-weight:1000;
+}
+
+.stack-info-form-group input{
+  width:100%;
+  min-height:44px;
+  border:1px solid #22304a;
+  border-radius:14px;
+  background:#09111d;
+  color:#e8edf7;
+  padding:10px 12px;
+}
+
+.stack-info-form-group input[type="number"]{
+  text-align:center;
+}
+
+.stack-info-help{
+  margin-top:10px;
+  color:#93a8c7;
+  font-size:13px;
+  line-height:1.45;
+  font-weight:800;
+}
+
+.stack-info-modal-actions{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  gap:8px;
+  margin-top:16px;
+}
+
+.stack-info-modal-actions button{
+  border:1px solid #315a93;
+  background:#102545;
+  color:#e7f1ff;
+  border-radius:999px;
+  padding:9px 13px;
+  min-height:42px;
+  font-weight:900;
+  white-space:nowrap;
+}
+
+#stackTileInfoPrivateBtn{
+  border-color:#475569;
+  background:#111827;
+  color:#e5e7eb;
 }
 
 #stackTilePanel .stack-tile-section{
@@ -170,11 +275,19 @@ body{
     padding:14px 10px 28px;
   }
 
-  .public-nickname-row{
+  .stack-info-form-grid{
     grid-template-columns:1fr;
   }
 
-  .public-nickname-row input[type="number"]{
+  .stack-info-form-group input[type="number"]{
     text-align:left;
+  }
+
+  .stack-info-modal-actions{
+    justify-content:stretch;
+  }
+
+  .stack-info-modal-actions button{
+    width:100%;
   }
 }

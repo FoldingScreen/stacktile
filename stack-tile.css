@@ -293,6 +293,35 @@ body{
   }
 }
 
+@media(max-width:760px){
+  #stackTileRoot .stack-tile-layout{
+    display:flex !important;
+    flex-direction:column !important;
+    gap:14px !important;
+  }
+
+  #stackTileRoot .stack-tile-game-card{
+    order:1 !important;
+    width:100% !important;
+    min-width:0 !important;
+  }
+
+  #stackTileRoot .stack-tile-ranking-card{
+    display:block !important;
+    order:2 !important;
+    width:100% !important;
+    max-width:none !important;
+    min-width:0 !important;
+    margin-top:14px !important;
+  }
+
+  #stackTileRoot .stack-tile-ranking-list{
+    display:block !important;
+    max-height:none !important;
+    overflow:visible !important;
+  }
+}
+
 @media(max-width:520px){
   .public-header{
     padding:12px 14px;

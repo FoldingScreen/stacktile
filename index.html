@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>겹겹타일 | 970 KOR</title>
   <link rel="stylesheet" href="https://foldingscreen.github.io/970KOR.github.io/style.css?v=split-34" />
-  <link rel="stylesheet" href="stack-tile.css?v=4" />
+  <link rel="stylesheet" href="stack-tile.css?v=5" />
 
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -28,6 +28,7 @@
 
         <div class="public-nickname-card">
           <label>내 정보</label>
+          <div id="stackTileInfoStatus" class="public-info-status"></div>
           <div class="public-info-actions">
             <button id="stackTileInfoOpenBtn" type="button" onclick="openPublicStackTileInfoModal('manual')">저장</button>
             <button id="stackTileNicknameClearBtn" class="hidden" type="button" onclick="clearPublicStackTileNickname()">삭제</button>
@@ -78,6 +79,6 @@
     </div>
   </div>
 
-  <script src="stack-tile.js?v=3"></script>
+  <script src="stack-tile.js?v=5"></script>
 </body>
 </html>

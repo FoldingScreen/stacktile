@@ -23,12 +23,21 @@ window.state={
   escapeLabyrinthTab:"stackTile"
 };
 
+let stackTileInfoModalMode="manual";
+let stackTileInfoModalResolve=null;
+let stackTileClearPromptAnswered=false;
+let stackTilePrivateRankingMode=false;
+
+function hasPublicStackTileInfo(){
+  return !!(String(state.serverNumber||"").trim()&&String(state.nickname||"").trim());
+}
+
 function getPublicStackTilePlayerLabel(){
   const server=String(state.serverNumber||"").trim();
   const nickname=String(state.nickname||"").trim();
 
   if(server&&nickname)return `${server}서버 ${nickname}`;
-  return nickname;
+  return "";
 }
 
 function updatePublicStackTileCurrentUser(){
@@ -53,16 +62,85 @@ function syncPublicStackTileNickname(){
 
   const serverInput=document.getElementById("stackTileServerInput");
   const nicknameInput=document.getElementById("stackTileNicknameInput");
+  const status=document.getElementById("stackTileInfoStatus");
   const help=document.getElementById("stackTileNicknameHelp");
-  const saveBtn=document.getElementById("stackTileNicknameSaveBtn");
+  const openBtn=document.getElementById("stackTileInfoOpenBtn");
   const clearBtn=document.getElementById("stackTileNicknameClearBtn");
   const label=state.currentUser||"";
 
   if(serverInput)serverInput.value=state.serverNumber||"";
   if(nicknameInput)nicknameInput.value=state.nickname||"";
-  if(help)help.textContent=label?`현재 랭킹 정보: ${label}`:"서버 숫자와 닉네임을 입력하면 클리어 기록이 랭킹에 저장됩니다.";
-  if(saveBtn)saveBtn.textContent=label?"정보 저장":"시작하기";
+
+  if(status){
+    status.textContent=label
+      ? `현재 랭킹 정보: ${label}`
+      : "정보를 저장하지 않아도 플레이할 수 있습니다. 첫 클리어 시 랭킹 등록 여부를 묻습니다.";
+  }
+
+  if(help){
+    help.textContent=stackTileInfoModalMode==="clear"
+      ? "예를 선택하면 입력한 정보로 등록되고, 아니오를 선택하면 비공개로 등록됩니다."
+      : "저장된 정보는 이 브라우저에만 보관됩니다.";
+  }
+
+  if(openBtn)openBtn.textContent=label?"정보 변경":"정보 저장";
   if(clearBtn)clearBtn.classList.toggle("hidden",!label);
+}
+
+function openPublicStackTileInfoModal(mode="manual"){
+  stackTileInfoModalMode=mode;
+  syncPublicStackTileNickname();
+
+  const overlay=document.getElementById("stackTileInfoOverlay");
+  const modal=document.getElementById("stackTileInfoModal");
+  const title=document.getElementById("stackTileInfoModalTitle");
+  const desc=document.getElementById("stackTileInfoModalDesc");
+  const closeBtn=document.getElementById("stackTileInfoCloseBtn");
+  const privateBtn=document.getElementById("stackTileInfoPrivateBtn");
+  const saveBtn=document.getElementById("stackTileInfoSaveBtn");
+
+  if(title)title.textContent=mode==="clear"?"랭킹 등록":"랭킹 정보 저장";
+  if(desc){
+    desc.textContent=mode==="clear"
+      ? "클리어했습니다! 랭킹 등록을 위해 서버 숫자와 닉네임을 저장할까요?"
+      : "서버 숫자와 닉네임을 저장하면 클리어 기록이 랭킹에 등록됩니다.";
+  }
+  if(closeBtn)closeBtn.classList.toggle("hidden",mode==="clear");
+  if(privateBtn)privateBtn.classList.toggle("hidden",mode!=="clear");
+  if(saveBtn)saveBtn.textContent=mode==="clear"?"예, 정보 저장 후 등록":"정보 저장";
+
+  overlay?.classList.remove("hidden");
+  modal?.classList.remove("hidden");
+
+  setTimeout(()=>{
+    const firstEmpty=String(document.getElementById("stackTileServerInput")?.value||"").trim()
+      ? document.getElementById("stackTileNicknameInput")
+      : document.getElementById("stackTileServerInput");
+    firstEmpty?.focus();
+  },0);
+
+  if(mode==="clear"){
+    return new Promise(resolve=>{
+      stackTileInfoModalResolve=resolve;
+    });
+  }
+
+  return Promise.resolve("manual");
+}
+
+function closePublicStackTileInfoModal(result="closed"){
+  if(stackTileInfoModalMode==="clear"&&result==="closed")return;
+
+  document.getElementById("stackTileInfoOverlay")?.classList.add("hidden");
+  document.getElementById("stackTileInfoModal")?.classList.add("hidden");
+
+  const resolve=stackTileInfoModalResolve;
+  stackTileInfoModalResolve=null;
+  stackTileInfoModalMode="manual";
+
+  if(resolve)resolve(result);
+
+  syncPublicStackTileNickname();
 }
 
 function savePublicStackTileNickname(){
@@ -85,32 +163,64 @@ function savePublicStackTileNickname(){
 
   state.serverNumber=serverNumber;
   state.nickname=nickname;
+  stackTilePrivateRankingMode=false;
   updatePublicStackTileCurrentUser();
 
   localStorage.setItem("stackTilePublicServerNumber",serverNumber);
   localStorage.setItem("stackTilePublicNickname",nickname);
 
-  syncPublicStackTileNickname();
+  const result=stackTileInfoModalMode==="clear"?"saved":"manual-saved";
+  closePublicStackTileInfoModal(result);
 
   if(typeof subscribeStackTileRecords==="function")subscribeStackTileRecords();
   if(typeof renderStackTileGame==="function")renderStackTileGame();
+}
+
+function submitPublicStackTilePrivateChoice(){
+  stackTilePrivateRankingMode=true;
+  stackTileClearPromptAnswered=true;
+  closePublicStackTileInfoModal("private");
 }
 
 function clearPublicStackTileNickname(){
   state.serverNumber="";
   state.nickname="";
   state.currentUser="";
+  stackTilePrivateRankingMode=false;
+  stackTileClearPromptAnswered=false;
 
   localStorage.removeItem("stackTilePublicServerNumber");
   localStorage.removeItem("stackTilePublicNickname");
 
   syncPublicStackTileNickname();
-  document.getElementById("stackTileServerInput")?.focus();
 
   if(typeof renderStackTileGame==="function")renderStackTileGame();
 }
 
+async function ensurePublicStackTileRankingChoiceForClear(){
+  updatePublicStackTileCurrentUser();
+
+  if(hasPublicStackTileInfo())return "saved";
+  if(stackTilePrivateRankingMode)return "private";
+
+  if(stackTileClearPromptAnswered){
+    stackTilePrivateRankingMode=true;
+    return "private";
+  }
+
+  stackTileClearPromptAnswered=true;
+  const result=await openPublicStackTileInfoModal("clear");
+
+  if(result==="saved"&&hasPublicStackTileInfo())return "saved";
+
+  stackTilePrivateRankingMode=true;
+  return "private";
+}
+
+window.openPublicStackTileInfoModal=openPublicStackTileInfoModal;
+window.closePublicStackTileInfoModal=closePublicStackTileInfoModal;
 window.savePublicStackTileNickname=savePublicStackTileNickname;
+window.submitPublicStackTilePrivateChoice=submitPublicStackTilePrivateChoice;
 window.clearPublicStackTileNickname=clearPublicStackTileNickname;
 
 function loadOriginalStackTileScript(){
@@ -130,20 +240,23 @@ function patchPublicStackTileRecordSaving(){
 
   window.saveStackTileRecord=async function(){
     if(stackTileState.clearSaved)return;
-    if(!state.currentUser)return;
+
+    const choice=await ensurePublicStackTileRankingChoiceForClear();
+    const isPrivate=choice!=="saved";
 
     stackTileState.clearSaved=true;
 
     const finalScore=calculateStackTileScore();
     const clearTimeMs=getStackTileElapsedMs();
-    const rawNickname=String(state.nickname||"").trim();
-    const serverNumber=String(state.serverNumber||"").trim();
-    const playerLabel=getPublicStackTilePlayerLabel();
+    const rawNickname=isPrivate?"":String(state.nickname||"").trim();
+    const serverNumber=isPrivate?"":String(state.serverNumber||"").trim();
+    const playerLabel=isPrivate?"비공개":getPublicStackTilePlayerLabel();
 
     const payload={
       nickname:playerLabel,
       rawNickname,
       serverNumber,
+      isPrivate,
       difficulty:stackTileState.difficulty,
       difficultyLabel:getStackTileConfig().label,
       score:finalScore,
@@ -163,7 +276,9 @@ function patchPublicStackTileRecordSaving(){
     try{
       await getStackTileRecordsRef().add(payload);
 
-      stackTileState.message="클리어 기록이 저장되었습니다.";
+      stackTileState.message=isPrivate
+        ? "비공개로 클리어 기록이 저장되었습니다."
+        : "클리어 기록이 저장되었습니다.";
       renderStackTileGame();
     }catch(err){
       console.error("겹겹타일 기록 저장 실패",err);
@@ -181,6 +296,10 @@ window.addEventListener("DOMContentLoaded",async()=>{
         savePublicStackTileNickname();
       }
     });
+  });
+
+  document.getElementById("stackTileInfoOverlay")?.addEventListener("click",()=>{
+    closePublicStackTileInfoModal();
   });
 
   try{

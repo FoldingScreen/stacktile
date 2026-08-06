@@ -92,6 +92,19 @@ body{
   font-weight:1000;
 }
 
+.public-info-status{
+  min-height:46px;
+  border:1px solid rgba(49,90,147,.58);
+  background:rgba(5,13,24,.55);
+  color:#dbeafe;
+  border-radius:16px;
+  padding:10px 12px;
+  font-size:14px;
+  line-height:1.45;
+  font-weight:900;
+  word-break:break-word;
+}
+
 .public-info-actions{
   display:flex;
   flex-wrap:wrap;

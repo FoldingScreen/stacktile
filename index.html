@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>겹겹타일 | 970 KOR</title>
   <link rel="stylesheet" href="https://foldingscreen.github.io/970KOR.github.io/style.css?v=split-34" />
-  <link rel="stylesheet" href="stack-tile.css?v=2" />
+  <link rel="stylesheet" href="stack-tile.css?v=3" />
 
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -29,13 +29,11 @@
 
         <div class="public-nickname-card">
           <label>랭킹 정보</label>
-          <div class="public-nickname-row">
-            <input id="stackTileServerInput" type="number" inputmode="numeric" min="1" max="9999" placeholder="서버 숫자" autocomplete="off" />
-            <input id="stackTileNicknameInput" type="text" maxlength="20" placeholder="닉네임" autocomplete="nickname" />
-            <button id="stackTileNicknameSaveBtn" type="button" onclick="savePublicStackTileNickname()">시작하기</button>
+          <div id="stackTileInfoStatus" class="public-nickname-help">정보를 저장하지 않아도 플레이할 수 있습니다.</div>
+          <div class="public-info-actions">
+            <button id="stackTileInfoOpenBtn" type="button" onclick="openPublicStackTileInfoModal('manual')">정보 저장</button>
+            <button id="stackTileNicknameClearBtn" class="hidden" type="button" onclick="clearPublicStackTileNickname()">정보 삭제</button>
           </div>
-          <div id="stackTileNicknameHelp" class="public-nickname-help">서버 숫자와 닉네임을 입력하면 클리어 기록이 랭킹에 저장됩니다.</div>
-          <button id="stackTileNicknameClearBtn" class="hidden" type="button" onclick="clearPublicStackTileNickname()">정보 변경</button>
         </div>
       </section>
 
@@ -51,6 +49,37 @@
     </main>
   </div>
 
-  <script src="stack-tile.js?v=2"></script>
+  <div id="stackTileInfoOverlay" class="stack-info-overlay hidden"></div>
+
+  <div id="stackTileInfoModal" class="stack-info-modal hidden" role="dialog" aria-modal="true" aria-labelledby="stackTileInfoModalTitle">
+    <div class="stack-info-modal-header">
+      <h3 id="stackTileInfoModalTitle">랭킹 정보 저장</h3>
+      <button id="stackTileInfoCloseBtn" type="button" onclick="closePublicStackTileInfoModal()">닫기</button>
+    </div>
+
+    <p id="stackTileInfoModalDesc" class="stack-info-modal-desc">
+      서버 숫자와 닉네임을 저장하면 클리어 기록이 랭킹에 등록됩니다.
+    </p>
+
+    <div class="stack-info-form-grid">
+      <div class="stack-info-form-group">
+        <label for="stackTileServerInput">서버 숫자</label>
+        <input id="stackTileServerInput" type="number" inputmode="numeric" min="1" max="9999" placeholder="예: 970" autocomplete="off" />
+      </div>
+      <div class="stack-info-form-group">
+        <label for="stackTileNicknameInput">닉네임</label>
+        <input id="stackTileNicknameInput" type="text" maxlength="20" placeholder="닉네임" autocomplete="nickname" />
+      </div>
+    </div>
+
+    <div id="stackTileNicknameHelp" class="stack-info-help">저장된 정보는 이 브라우저에만 보관됩니다.</div>
+
+    <div class="stack-info-modal-actions">
+      <button id="stackTileInfoSaveBtn" type="button" onclick="savePublicStackTileNickname()">정보 저장</button>
+      <button id="stackTileInfoPrivateBtn" class="hidden" type="button" onclick="submitPublicStackTilePrivateChoice()">아니오, 비공개 등록</button>
+    </div>
+  </div>
+
+  <script src="stack-tile.js?v=3"></script>
 </body>
 </html>

@@ -17,9 +17,25 @@ firebase.firestore().settings({
 window.db=firebase.firestore();
 
 window.state={
-  currentUser:localStorage.getItem("stackTilePublicNickname")||"",
+  serverNumber:localStorage.getItem("stackTilePublicServerNumber")||"",
+  nickname:localStorage.getItem("stackTilePublicNickname")||"",
+  currentUser:"",
   escapeLabyrinthTab:"stackTile"
 };
+
+function getPublicStackTilePlayerLabel(){
+  const server=String(state.serverNumber||"").trim();
+  const nickname=String(state.nickname||"").trim();
+
+  if(server&&nickname)return `${server}서버 ${nickname}`;
+  return nickname;
+}
+
+function updatePublicStackTileCurrentUser(){
+  state.currentUser=getPublicStackTilePlayerLabel();
+}
+
+updatePublicStackTileCurrentUser();
 
 window.escapeHtml=function(s){
   return String(s??"")
@@ -33,30 +49,47 @@ window.escapeHtml=function(s){
 window.updateEscapeLabyrinthHomePanels=function(){};
 
 function syncPublicStackTileNickname(){
-  const nickname=state.currentUser||"";
-  const input=document.getElementById("stackTileNicknameInput");
+  updatePublicStackTileCurrentUser();
+
+  const serverInput=document.getElementById("stackTileServerInput");
+  const nicknameInput=document.getElementById("stackTileNicknameInput");
   const help=document.getElementById("stackTileNicknameHelp");
   const saveBtn=document.getElementById("stackTileNicknameSaveBtn");
   const clearBtn=document.getElementById("stackTileNicknameClearBtn");
+  const label=state.currentUser||"";
 
-  if(input)input.value=nickname;
-  if(help)help.textContent=nickname?`현재 닉네임: ${nickname}`:"닉네임을 입력하면 클리어 기록이 랭킹에 저장됩니다.";
-  if(saveBtn)saveBtn.textContent=nickname?"닉네임 저장":"시작하기";
-  if(clearBtn)clearBtn.classList.toggle("hidden",!nickname);
+  if(serverInput)serverInput.value=state.serverNumber||"";
+  if(nicknameInput)nicknameInput.value=state.nickname||"";
+  if(help)help.textContent=label?`현재 랭킹 정보: ${label}`:"서버 숫자와 닉네임을 입력하면 클리어 기록이 랭킹에 저장됩니다.";
+  if(saveBtn)saveBtn.textContent=label?"정보 저장":"시작하기";
+  if(clearBtn)clearBtn.classList.toggle("hidden",!label);
 }
 
 function savePublicStackTileNickname(){
-  const input=document.getElementById("stackTileNicknameInput");
-  const nickname=String(input?.value||"").trim();
+  const serverInput=document.getElementById("stackTileServerInput");
+  const nicknameInput=document.getElementById("stackTileNicknameInput");
+  const serverNumber=String(serverInput?.value||"").trim().replace(/[^0-9]/g,"");
+  const nickname=String(nicknameInput?.value||"").trim();
 
-  if(!nickname){
-    alert("닉네임을 입력하세요.");
-    input?.focus();
+  if(!serverNumber){
+    alert("서버 숫자를 입력하세요.");
+    serverInput?.focus();
     return;
   }
 
-  state.currentUser=nickname;
+  if(!nickname){
+    alert("닉네임을 입력하세요.");
+    nicknameInput?.focus();
+    return;
+  }
+
+  state.serverNumber=serverNumber;
+  state.nickname=nickname;
+  updatePublicStackTileCurrentUser();
+
+  localStorage.setItem("stackTilePublicServerNumber",serverNumber);
   localStorage.setItem("stackTilePublicNickname",nickname);
+
   syncPublicStackTileNickname();
 
   if(typeof subscribeStackTileRecords==="function")subscribeStackTileRecords();
@@ -64,10 +97,15 @@ function savePublicStackTileNickname(){
 }
 
 function clearPublicStackTileNickname(){
+  state.serverNumber="";
+  state.nickname="";
   state.currentUser="";
+
+  localStorage.removeItem("stackTilePublicServerNumber");
   localStorage.removeItem("stackTilePublicNickname");
+
   syncPublicStackTileNickname();
-  document.getElementById("stackTileNicknameInput")?.focus();
+  document.getElementById("stackTileServerInput")?.focus();
 
   if(typeof renderStackTileGame==="function")renderStackTileGame();
 }
@@ -85,22 +123,69 @@ function loadOriginalStackTileScript(){
   });
 }
 
+function patchPublicStackTileRecordSaving(){
+  window.getStackTileRecordsRef=function(){
+    return db.collection("publicGames").doc("stack_tile").collection("records");
+  };
+
+  window.saveStackTileRecord=async function(){
+    if(stackTileState.clearSaved)return;
+    if(!state.currentUser)return;
+
+    stackTileState.clearSaved=true;
+
+    const finalScore=calculateStackTileScore();
+    const clearTimeMs=getStackTileElapsedMs();
+    const rawNickname=String(state.nickname||"").trim();
+    const serverNumber=String(state.serverNumber||"").trim();
+    const playerLabel=getPublicStackTilePlayerLabel();
+
+    const payload={
+      nickname:playerLabel,
+      rawNickname,
+      serverNumber,
+      difficulty:stackTileState.difficulty,
+      difficultyLabel:getStackTileConfig().label,
+      score:finalScore,
+      clearTimeMs,
+      clearTimeText:formatStackTileTime(clearTimeMs),
+      moveCount:stackTileState.moveCount,
+      matchCount:stackTileState.matchCount,
+      matchScore:stackTileState.matchScore,
+      itemPenalty:stackTileState.itemPenalty,
+      timeBonus:stackTileState.timeBonus,
+      usedItems:{...stackTileState.usedItems},
+      source:"public_stacktile",
+      createdAt:firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    try{
+      await getStackTileRecordsRef().add(payload);
+
+      stackTileState.message="클리어 기록이 저장되었습니다.";
+      renderStackTileGame();
+    }catch(err){
+      console.error("겹겹타일 기록 저장 실패",err);
+    }
+  };
+}
+
 window.addEventListener("DOMContentLoaded",async()=>{
   syncPublicStackTileNickname();
 
-  document.getElementById("stackTileNicknameInput")?.addEventListener("keydown",event=>{
-    if(event.key==="Enter"){
-      event.preventDefault();
-      savePublicStackTileNickname();
-    }
+  ["stackTileServerInput","stackTileNicknameInput"].forEach(id=>{
+    document.getElementById(id)?.addEventListener("keydown",event=>{
+      if(event.key==="Enter"){
+        event.preventDefault();
+        savePublicStackTileNickname();
+      }
+    });
   });
 
   try{
     await loadOriginalStackTileScript();
-
-    window.getStackTileRecordsRef=function(){
-      return db.collection("publicGames").doc("stack_tile").collection("records");
-    };
+    patchPublicStackTileRecordSaving();
 
     if(typeof renderStackTileScreen==="function")renderStackTileScreen();
   }catch(err){

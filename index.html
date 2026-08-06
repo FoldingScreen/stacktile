@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>겹겹타일 | 970 KOR</title>
+  <link rel="stylesheet" href="https://foldingscreen.github.io/970KOR.github.io/style.css?v=split-34" />
+  <link rel="stylesheet" href="stack-tile.css?v=1" />
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+<body>
+  <div class="public-page">
+    <header class="public-header">
+      <div class="public-brand">970 KOR</div>
+      <div class="public-title">겹겹타일</div>
+    </header>
+
+    <main class="public-container">
+      <section class="public-hero">
+        <div class="public-hero-card">
+          <h1>겹겹타일</h1>
+          <p>
+            겹쳐진 타일 중 완전히 드러난 타일만 선택하세요.<br />
+            선택한 타일은 7칸 대기열로 이동하고, 같은 타일 3개가 모이면 사라집니다.
+          </p>
+        </div>
+
+        <div class="public-nickname-card">
+          <label for="stackTileNicknameInput">랭킹 닉네임</label>
+          <div class="public-nickname-row">
+            <input id="stackTileNicknameInput" type="text" maxlength="20" placeholder="닉네임 입력" autocomplete="nickname" />
+            <button id="stackTileNicknameSaveBtn" type="button" onclick="savePublicStackTileNickname()">시작하기</button>
+          </div>
+          <div id="stackTileNicknameHelp" class="public-nickname-help">닉네임을 입력하면 클리어 기록이 랭킹에 저장됩니다.</div>
+          <button id="stackTileNicknameClearBtn" class="hidden" type="button" onclick="clearPublicStackTileNickname()">닉네임 변경</button>
+        </div>
+      </section>
+
+      <section id="stackTilePanel">
+        <div class="labyrinth-section stack-tile-section">
+          <div class="section-header-row public-game-header">
+            <h3 class="section-title">겹겹타일</h3>
+            <button type="button" class="inline-btn" onclick="restartStackTileGame()">새 게임</button>
+          </div>
+          <div id="stackTileRoot"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="stack-tile.js?v=1"></script>
+</body>
+</html>
